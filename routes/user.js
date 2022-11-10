@@ -13,6 +13,11 @@ router.put(
   middlewareController.verifyToken,
   userController.updateUserProfile
 );
+router.put(
+  "/updateAvatar",
+  middlewareController.verifyToken,
+  userController.updateUserAvatar
+);
 
 router.delete(
   "/delete",
@@ -31,6 +36,7 @@ router.delete(
   middlewareController.verifyToken,
   userController.removeAFilm
 );
+
 router.delete(
   "/removeAllItem",
   middlewareController.verifyToken,

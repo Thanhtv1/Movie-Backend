@@ -41,8 +41,10 @@ const authController = {
       if (!validateEmail(email)) {
         return res.status(400).json("Invalid Email");
       }
-      const checkEmail = await User.findOne({ email });
-      const checkUserName = await User.findOne({ username });
+      const checkEmail = await User.findOne({ email: email.toLowerCase() });
+      const checkUserName = await User.findOne({
+        username: username.toLowerCase(),
+      });
       if (checkEmail) {
         return res.status(400).json("The email already exists");
       }
@@ -54,7 +56,7 @@ const authController = {
           .status(400)
           .json("Password must contain more than 5 characters");
       }
-      const hashed = await bcrypt.hash(password, 10);
+      const hashed = await bcrypt.hash(password.toLowerCase(), 10);
       const newUser = await new User({
         username: username,
         email: email,
@@ -70,11 +72,14 @@ const authController = {
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: email.toLowerCase() });
       if (!user) {
         return res.status(404).json("This email does not exists!");
       }
-      const validPassword = await bcrypt.compare(password, user.password);
+      const validPassword = await bcrypt.compare(
+        password.toLowerCase(),
+        user.password
+      );
       if (!validPassword) {
         return res.status(404).json("Wrong password!");
       }
@@ -85,7 +90,7 @@ const authController = {
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: false,
-          expires: new Date(Date.now() + (60*24*3600000)),
+          expires: new Date(Date.now() + 60 * 24 * 3600000),
           path: "/",
           sameSite: "strict",
         });
@@ -125,7 +130,7 @@ const authController = {
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: false,
-        expires: new Date(Date.now() + (60*24*3600000)),
+        expires: new Date(Date.now() + 60 * 24 * 3600000),
         path: "/",
         sameSite: "strict",
       });

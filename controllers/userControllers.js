@@ -6,29 +6,42 @@ const userController = {
   getUserProfile: async (req, res) => {
     try {
       const user = await User.findOne({ _id: req.user._id });
-      const { password, email, ...rest } = user._doc;
-      return res.status(200).json(rest);
+      const { password, ...rest } = user._doc;
+      return res.status(200).json({ user: rest });
     } catch (error) {
       return res.status(500).json(error);
     }
   },
-
+  updateUserAvatar: async (req, res) => {
+    try {
+      const { picture } = req.body;
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          avatar: picture || req.user.avatar,
+        },
+        { new: true }
+      );
+      return res.status(200).json("Updated avatar successfully");
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  },
   updateUserProfile: async (req, res) => {
     try {
-      const { currentEmail, currentPass, newEmail, newPass, pic, username } =
-        req.body;
+      const { currentPass, newEmail, newPass, username } = req.body;
       const validPassword = await bcrypt.compare(
         currentPass,
         req.user.password
       );
-      if (req.user.email === currentEmail && validPassword) {
-        const checkEmail = await User.findOne({ email: newEmail });
-        const checkUserName = await User.findOne({ username });
-        if (checkEmail) {
-          return res.status(401).json("The email already exists");
+      if (validPassword) {
+        const isEmailAvailable = await User.findOne({ email: newEmail });
+        const isUsernameAvailable = await User.findOne({ username });
+        if (isEmailAvailable) {
+          return res.status(401).json("This email already exists");
         }
-        if (checkUserName) {
-          return res.status(401).json("The username already exists");
+        if (isUsernameAvailable) {
+          return res.status(401).json("This username already exists");
         }
         await User.findByIdAndUpdate(
           req.user._id,
@@ -39,15 +52,12 @@ const userController = {
               newPass === ""
                 ? req.user.password
                 : await bcrypt.hash(newPass, 10),
-            avatar: pic || req.user.avatar,
           },
           { new: true }
         );
-        return res
-          .status(200)
-          .json("Successfully updated, please reload the page");
+        return res.status(200).json("Updated profile successfully");
       } else {
-        return res.status(404).json("Invalid Information");
+        return res.status(404).json("Invalid Current Password");
       }
     } catch (error) {
       return res.status(500).json(error);
