@@ -16,16 +16,14 @@ moongoose.connect(process.env.MONGODB_URL, () => {
 });
 
 app.use(
-  bodyParser.urlencoded({
-    extended: false,
-  })
-);
-app.use(
   cors({
     credentials: true,
     origin: true,
   })
 );
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -33,7 +31,7 @@ app.use("/auth", authRoute);
 app.use("/user", userRoute);
 
 app.get("/", (req, res) => {
-  res.send("app");
+  res.send("hello app");
 });
 
 app.listen(process.env.PORT, () => {

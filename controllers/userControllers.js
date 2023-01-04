@@ -7,7 +7,7 @@ const userController = {
     try {
       const user = await User.findOne({ _id: req.user._id });
       const { password, ...rest } = user._doc;
-      return res.status(200).json({ user: rest });
+      return res.status(200).json(rest);
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -18,10 +18,11 @@ const userController = {
       await User.findByIdAndUpdate(
         req.user._id,
         {
-          avatar: picture || req.user.avatar,
+          avatar: picture,
         },
         { new: true }
       );
+      // await save();
       return res.status(200).json("Updated avatar successfully");
     } catch (error) {
       return res.status(500).json(error);
@@ -57,7 +58,7 @@ const userController = {
         );
         return res.status(200).json("Updated profile successfully");
       } else {
-        return res.status(404).json("Invalid Current Password");
+        return res.status(404).json("Invalid Confirm Password");
       }
     } catch (error) {
       return res.status(500).json(error);
@@ -66,8 +67,20 @@ const userController = {
 
   deleteUser: async (req, res) => {
     try {
-      await User.findOneAndDelete({ _id: req.user._id });
-      return res.status(200).json("Delete Successfully");
+      const { confirmPass } = req.body;
+      const validPassword = await bcrypt.compare(
+        confirmPass,
+        req.user.password
+      );
+      res.clearCookie("refreshToken");
+      // return res.status(200).json("Delete test");
+      if (validPassword) {
+        await User.findOneAndDelete({ _id: req.user._id });
+        res.clearCookie("refreshToken");
+        return res.status(200).json("Delete Successfully");
+      } else {
+        res.status(403).json("Invalid Confirm Password");
+      }
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -79,7 +92,7 @@ const userController = {
       const user = await User.findOne({ _id: req.user.id });
       if (user) {
         const { favMovies } = user;
-        const isAlreadyAdded = favMovies.find(({ id }) => id === data.id);
+        const isAlreadyAdded = favMovies.find(({ id }) => id == data.id);
         if (!isAlreadyAdded) {
           await User.findByIdAndUpdate(
             user._id,
@@ -90,7 +103,7 @@ const userController = {
           );
         } else return res.status(400).json("You have already added this");
       }
-      return res.json("Added successfully");
+      return res.json({ msg: "Added successfully", data: user });
     } catch (error) {
       return res.json("Error adding");
     }
@@ -99,21 +112,23 @@ const userController = {
   removeAFilm: async (req, res) => {
     try {
       const { data } = req.body;
+      // return res.status(200).json(req.body.data);
       const user = await User.findOne({ _id: req.user._id });
       if (user) {
-        const { favMovies } = user;
-        const isAvailable = favMovies.find(({ id }) => id === data.id);
+        let { favMovies } = user;
+        const isAvailable = favMovies.find(({ id }) => id == data);
         if (isAvailable) {
+          const newArr = favMovies.filter(({ id }) => id !== data * 1);
           await User.findByIdAndUpdate(
             user._id,
             {
-              favMovies: favMovies.filter(({ id }) => id !== data.id),
+              favMovies: newArr,
             },
             { new: true }
           );
         } else return res.status(400).json("The item is already removed");
       }
-      return res.status(200).json("Removed Successfully");
+      return res.status(200).json("Remove successfully");
     } catch (error) {
       return res.status(400).json("Error Removing");
     }

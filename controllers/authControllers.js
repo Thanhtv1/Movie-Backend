@@ -122,11 +122,11 @@ const authController = {
       if (err) {
         return res.status.json(err);
       }
-      refreshTokens = refreshTokens.filter((token) => token !== rfToken);
+      // refreshTokens = refreshTokens.filter((token) => token !== rfToken);
       // create new acc and refresh token
       const newAccessToken = createAccessToken(user);
       const newRefreshToken = createRefreshToken(user);
-      refreshTokens.push(newRefreshToken);
+      // refreshTokens.push(newRefreshToken);
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: false,

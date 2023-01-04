@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      // required: true,
       minlength: 6,
     },
     admin: {
@@ -26,9 +26,9 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     avatar: {
-      required: true,
-      default: "https://cdn-icons-png.flaticon.com/512/5460/5460864.png",
       type: String,
+      required: true,
+      default: "https://cdn-icons-png.flaticon.com/512/94/94386.png",
     },
     favMovies: Array,
   },
