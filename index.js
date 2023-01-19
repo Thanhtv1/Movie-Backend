@@ -18,7 +18,7 @@ moongoose.connect(process.env.MONGODB_URL, () => {
 app.use(
   cors({
     credentials: true,
-    origin: true,
+    origin: "https://t-chill-movie.vercel.app",
   })
 );
 app.use(bodyParser.json());
