@@ -128,11 +128,11 @@ const authController = {
       const newRefreshToken = createRefreshToken(user);
       // refreshTokens.push(newRefreshToken);
       res.cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
+//         httpOnly: true,
         secure: true,
         expires: new Date(Date.now() + 60 * 24 * 3600000),
         path: "/",
-        sameSite: "strict",
+        sameSite: "none",
       });
       res.status(200).json({ accessToken: newAccessToken });
     });
