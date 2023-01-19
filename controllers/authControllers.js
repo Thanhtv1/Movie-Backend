@@ -15,7 +15,7 @@ const createAccessToken = (user) => {
     },
     process.env.ACCESS_TOKEN_KEY,
     {
-      expiresIn: "1d",
+      expiresIn: "20d",
     }
   );
 };
