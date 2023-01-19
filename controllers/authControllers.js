@@ -129,7 +129,7 @@ const authController = {
       // refreshTokens.push(newRefreshToken);
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         expires: new Date(Date.now() + 60 * 24 * 3600000),
         path: "/",
         sameSite: "strict",
