@@ -90,9 +90,9 @@ const authController = {
         res.cookie("refreshToken", refreshToken, {
 //           httpOnly: true,
           secure: true,
-          expires: new Date(Date.now() + 60 * 24 * 3600000),
-          path: "/",
           sameSite: "none",
+          expires: new Date(Date.now() + 60 * 24 * 3600000),
+//           path: "/",
         });
         const { password, ...rest } = user._doc;
         return res.status(200).json({ user: { ...rest, accessToken } });
@@ -130,9 +130,9 @@ const authController = {
       res.cookie("refreshToken", newRefreshToken, {
 //         httpOnly: true,
         secure: true,
-        expires: new Date(Date.now() + 60 * 24 * 3600000),
-        path: "/",
         sameSite: "none",
+        expires: new Date(Date.now() + 60 * 24 * 3600000),
+//         path: "/",
       });
       res.status(200).json({ accessToken: newAccessToken });
     });
