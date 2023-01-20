@@ -15,7 +15,7 @@ const createAccessToken = (user) => {
     },
     process.env.ACCESS_TOKEN_KEY,
     {
-      expiresIn: "20d",
+      expiresIn: "30d",
     }
   );
 };
@@ -86,13 +86,13 @@ const authController = {
       if (user && validPassword) {
         const accessToken = createAccessToken(user);
         const refreshToken = createRefreshToken(user);
-        refreshTokens.push(refreshToken);
+//         refreshTokens.push(refreshToken);
         res.cookie("refreshToken", refreshToken, {
-//           httpOnly: true,
-          secure: true,
+          httpOnly: true,
           sameSite: "none",
+          secure: true,
           expires: new Date(Date.now() + 60 * 24 * 3600000),
-//           path: "/",
+          path: "/",
         });
         const { password, ...rest } = user._doc;
         return res.status(200).json({ user: { ...rest, accessToken } });
@@ -122,17 +122,16 @@ const authController = {
       if (err) {
         return res.status.json(err);
       }
-      // refreshTokens = refreshTokens.filter((token) => token !== rfToken);
       // create new acc and refresh token
       const newAccessToken = createAccessToken(user);
       const newRefreshToken = createRefreshToken(user);
       // refreshTokens.push(newRefreshToken);
       res.cookie("refreshToken", newRefreshToken, {
-//         httpOnly: true,
-        secure: true,
+        httpOnly: true,
         sameSite: "none",
+        secure: true,
         expires: new Date(Date.now() + 60 * 24 * 3600000),
-//         path: "/",
+        path: "/",
       });
       res.status(200).json({ accessToken: newAccessToken });
     });
